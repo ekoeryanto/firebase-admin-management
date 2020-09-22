@@ -1,0 +1,62 @@
+{
+  "name": "firebase-admin-management",
+  "version": "0.1.0",
+  "description": "firebase-admin-management skeleton.",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "vercel-build": "ncc build src/index.ts -e firebase-admin -o api",
+    "serve": "tsnd --respawn --transpile-only src/server.ts",
+    "compile-schemas": "json2ts -i src/schemas -o src/types",
+    "lint": "eslint --cache \"**/*.{js,ts}\" --quiet",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ekoeryanto/api-fastify.git"
+  },
+  "keywords": [
+    "fastify",
+    "scaffold",
+    "typescript"
+  ],
+  "author": "Eko Eryanto <ekoeryanto@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ekoeryanto/api-fastify/issues"
+  },
+  "homepage": "https://github.com/ekoeryanto/api-fastify#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "fastify": "^3.4.1",
+    "fastify-cookie": "^4.1.0",
+    "fastify-cors": "^4.1.0",
+    "fastify-plugin": "^2.3.4",
+    "firebase-admin": "^9.2.0"
+  },
+  "devDependencies": {
+    "@types/eslint": "^7.2.2",
+    "@types/node": "^14.10.2",
+    "@typescript-eslint/eslint-plugin": "^4.1.1",
+    "@typescript-eslint/parser": "^4.1.1",
+    "@vercel/ncc": "^0.24.1",
+    "@vercel/node": "^1.8.2",
+    "eslint": "^7.9.0",
+    "husky": "^4.3.0",
+    "jest": "^26.4.2",
+    "json-schema-to-typescript": "^9.1.1",
+    "lint-staged": "^10.4.0",
+    "pino-pretty": "^4.2.1",
+    "ts-jest": "^26.3.0",
+    "ts-node-dev": "^1.0.0-pre.62",
+    "typescript": "^4.0.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --cache --fix"
+  }
+}
