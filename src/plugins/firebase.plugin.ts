@@ -8,7 +8,7 @@ interface FirebasePluginOptions {
   name?: string;
 }
 
-type claimerType = (payload: admin.auth.DecodedIdToken) => boolean | undefined
+export type claimerType = (payload: admin.auth.DecodedIdToken) => boolean | undefined
 
 const firebasePlugin: FastifyPluginAsync<FirebasePluginOptions> = async (app, opts) => {
   const {
