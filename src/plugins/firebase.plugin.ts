@@ -18,6 +18,7 @@ const firebasePlugin: FastifyPluginAsync<FirebasePluginOptions> = async (app, op
     FIREBASE_PROJECT_ID,
     FIREBASE_CONFIG,
     FIREBASE_REFRESH_TOKEN,
+    FIREBASE_CERT,
     GOOGLE_APPLICATION_CREDENTIALS
   } = process.env;
 
@@ -26,13 +27,18 @@ const firebasePlugin: FastifyPluginAsync<FirebasePluginOptions> = async (app, op
   let credential;
 
   if (!admin.apps.length) {
-    if (GOOGLE_APPLICATION_CREDENTIALS && FIREBASE_CONFIG) {
-      admin.initializeApp();
+    if (GOOGLE_APPLICATION_CREDENTIALS) {
+      if (FIREBASE_CONFIG) {
+        admin.initializeApp();
+      } else {
+        admin.initializeApp({ credential: admin.credential.applicationDefault() }, name);
+      }
     } else {
-      if (GOOGLE_APPLICATION_CREDENTIALS && !FIREBASE_CONFIG) {
-        credential = admin.credential.applicationDefault();
-      } else if (refreshToken) {
+      if (refreshToken) {
         credential = admin.credential.refreshToken(refreshToken);
+      } if (FIREBASE_CERT) {
+        const cert = FIREBASE_CERT.startsWith("{") ? JSON.parse(FIREBASE_CERT) : require(FIREBASE_CERT);
+        credential = admin.credential.cert(cert);
       } else {
         const {
           clientEmail = FIREBASE_CLIENT_EMAIL,
