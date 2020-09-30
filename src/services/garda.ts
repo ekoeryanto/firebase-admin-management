@@ -1,4 +1,4 @@
-import { FastifyPluginAsync } from "fastify";
+import { FastifyPluginAsync, FastifySchema } from "fastify";
 import { auth } from "firebase-admin";
 
 const claimer = (c: auth.DecodedIdToken & { rol?: string[] }) => c.rol?.includes("uad");
@@ -71,6 +71,30 @@ const garda: FastifyPluginAsync = async app => {
     preHandler: [app.verifyIdToken(claimer)],
     async handler(req) {
       return this.admin.auth().listUsers(req.query.limit || 100,  req.query.next);
+    }
+  });
+
+  const createUserSchema: FastifySchema = {
+    body: {
+      type: "object",
+      properties: {
+      disabled: { type: "boolean", default: true },
+      displayName: {type: "string"},
+      email: {type: "string"},
+      emailVerified: { type: "boolean", default: false },
+      password: {type: "string"},
+      phoneNumber: {type: "string"},
+      photoURL: {type: "string"},
+      }
+    }
+  };
+
+  app.route<{Body: auth.CreateRequest}>({
+    method: "POST",
+    url: "/user",
+    schema: createUserSchema,
+    async handler(req) {
+      return this.admin.auth().createUser(req.body);
     }
   });
 
