@@ -4,15 +4,16 @@ import { auth } from "firebase-admin";
 const claimer = (c: auth.DecodedIdToken & { rol?: string[] }) => c.rol?.includes("uad");
 
 const garda: FastifyPluginAsync = async app => {
+
   // set custom claim
   app.route<{ Body: Record<string, unknown>, Params: { uid: string } }>({
-    url: "/claim/:uid",
-    method: "PATCH",
+    url: "/claims/:uid",
+    method: "PUT",
     preHandler: [app.verifyIdToken(claimer)],
     async handler(req) {
-      this.admin.auth().setCustomUserClaims(req.params.uid, req.body);
+      await this.admin.auth().setCustomUserClaims(req.params.uid, req.body);
       return this.admin.auth()
-        .getUser(req.params.uid).then(user => user.toJSON());
+        .getUser(req.params.uid).then(user => user.customClaims);
     }
   });
 
@@ -36,7 +37,7 @@ const garda: FastifyPluginAsync = async app => {
       const { token } = request.body;
       const { sub } = request.claims;
 
-      const document = await app.admin.firestore().collection("token").doc(token);
+      const document = app.admin.firestore().collection("token").doc(token);
 
       const tokenCol = await document.get();
 
@@ -60,7 +61,9 @@ const garda: FastifyPluginAsync = async app => {
 
       await this.admin.auth().setCustomUserClaims(sub, claims);
 
-      reply.code(205).send(claims);
+      reply.code(205);
+
+      return this.admin.auth().getUser(sub).then(user => user.toJSON());
     }
   });
 
@@ -89,24 +92,25 @@ const garda: FastifyPluginAsync = async app => {
     }
   };
 
+  // create user
   app.route<{Body: auth.CreateRequest}>({
     method: "POST",
     url: "/user",
     schema: createUserSchema,
+    preHandler: [app.verifyIdToken(claimer)],
     async handler(req) {
       return this.admin.auth().createUser(req.body);
     }
   });
 
   // update user
-  app.route<{ Body: Record<string, unknown>, Params: { uid: string } }>({
-    url: "/user/:uid",
+  app.route<{Body: auth.UpdateRequest, Params: { uid: string }}>({
     method: "PATCH",
+    url: "/user/:uid",
     preHandler: [app.verifyIdToken(claimer)],
-    async handler(req) {
-      this.admin.auth().setCustomUserClaims(req.params.uid, req.body);
-      return this.admin.auth()
-        .getUser(req.params.uid).then(user => user.toJSON());
+    async handler (req) {
+      const { uid } = req.params;
+      return this.admin.auth().updateUser(uid, req.body);
     }
   });
 
