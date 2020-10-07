@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "vercel-build": "ncc build src/index.ts -e firebase-admin -o api",
-    "serve": "tsnd --respawn --transpile-only src/server.ts",
+    "serve": "tsnd -r tsconfig-paths/register --respawn --transpile-only src/server.ts",
     "compile-schemas": "json2ts -i src/schemas -o src/types",
     "lint": "eslint --cache \"**/*.{js,ts}\" --quiet",
     "test": "jest"
@@ -49,6 +49,7 @@
     "pino-pretty": "^4.2.1",
     "ts-jest": "^26.3.0",
     "ts-node-dev": "^1.0.0-pre.62",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^4.0.2"
   },
   "husky": {

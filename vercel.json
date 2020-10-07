@@ -5,12 +5,6 @@
       "NODEJS_HELPERS": "0"
     }
   },
-  "env": {
-    "COOKIE_SECRET": "@sipelam-cookie-salt",
-    "FIREBASE_CLIENT_EMAIL": "@sipelam-client-email",
-    "FIREBASE_PRIVATE_KEY": "@sipelam-private-key",
-    "FIREBASE_PROJECT_ID": "si-pelam"
-  },
   "routes": [
     { "src": "/.*", "dest": "/api/index.js"}
   ]
