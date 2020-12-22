@@ -56,14 +56,20 @@ const firebasePlugin: FastifyPluginAsync<FirebasePluginOptions> = async (app, op
   app.decorate("admin", admin);
 
   const verifyIdToken = (claimer?: claimerType) => async (request: FastifyRequest) => {
-    const [type, token = request.cookies.__session] = (request.headers.authorization?.toString() || "").split(" ", 2);
+    const [_, token] = (request.headers.authorization?.toString() || "").split(" ", 2);
+    const cookie = request.cookies.__session || "";
 
-    if (!token || type.toLowerCase() !== "bearer") {
+    if (!cookie || !token) {
       throw app.err(401, "Invalid token");
     }
 
     try {
-      const claims = await admin.auth().verifyIdToken(token);
+      let claims;
+      if (cookie) {
+        claims = await admin.auth().verifySessionCookie(cookie);
+      } else {
+        claims = await admin.auth().verifyIdToken(token);
+      }
 
       if (claimer && !claimer(claims)) {
         throw app.err(401);
